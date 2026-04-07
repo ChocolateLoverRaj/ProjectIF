@@ -17,13 +17,8 @@ async fn main(spawner: Spawner) {
 
     // Needed for esp_rtos
     let timg0 = TimerGroup::new(peripherals.TIMG0);
-    #[cfg(riscv)]
     let software_interrupt = SoftwareInterruptControl::new(peripherals.SW_INTERRUPT);
-    esp_rtos::start(
-        timg0.timer0,
-        #[cfg(riscv)]
-        software_interrupt.software_interrupt0,
-    );
+    esp_rtos::start(timg0.timer0, software_interrupt.software_interrupt0);
 
     info!("Hello from a Rust no_std environment with esp_rtos (basically embassy for ESP32).");
 }

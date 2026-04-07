@@ -18,6 +18,7 @@ esp-bootloader-esp-idf = "0.4.0"
 esp-hal = { version = "1.0.0", features = ["defmt", "unstable"] }
 esp-println = { version = "0.16.1", features = ["defmt-espflash"] }
 esp-rtos = { version = "0.2.0", features = ["defmt", "embassy"] }
+trouble-host = { git = "https://github.com/embassy-rs/trouble", version = "0.6.0" }
 
 [features]
 default = ["esp32s3"]
@@ -35,3 +36,13 @@ esp32s3 = [
     "esp-println/esp32s3",
     "esp-bootloader-esp-idf/esp32s3",
 ]
+
+[patch.crates-io]
+esp-alloc =             { git = "https://github.com/esp-rs/esp-hal", rev="94ad74c69ccda9e84272fe4436c69400ce6f09fe" }
+esp-backtrace =         { git = "https://github.com/esp-rs/esp-hal", rev="94ad74c69ccda9e84272fe4436c69400ce6f09fe" }
+esp-bootloader-esp-idf ={ git = "https://github.com/esp-rs/esp-hal", rev="94ad74c69ccda9e84272fe4436c69400ce6f09fe" }
+esp-hal =               { git = "https://github.com/esp-rs/esp-hal", rev="94ad74c69ccda9e84272fe4436c69400ce6f09fe" }
+esp-println =           { git = "https://github.com/esp-rs/esp-hal", rev="94ad74c69ccda9e84272fe4436c69400ce6f09fe" }
+esp-radio =             { git = "https://github.com/esp-rs/esp-hal", rev="94ad74c69ccda9e84272fe4436c69400ce6f09fe" }
+esp-rtos =              { git = "https://github.com/esp-rs/esp-hal", rev="94ad74c69ccda9e84272fe4436c69400ce6f09fe" }
+esp-storage =           { git = "https://github.com/esp-rs/esp-hal", rev="94ad74c69ccda9e84272fe4436c69400ce6f09fe" }
