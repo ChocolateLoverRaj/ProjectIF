@@ -12,7 +12,9 @@ bench = false
 
 [dependencies]
 defmt = "1.0.1"
+embassy-embedded-hal = "0.6.0"
 embassy-executor = "0.9.1"
+esp-alloc = "0.9.0"
 esp-backtrace = { version = "0.18.1", features = ["panic-handler", "println"] }
 esp-bootloader-esp-idf = "0.4.0"
 esp-hal = { version = "1.0.0", features = ["defmt", "unstable"] }
@@ -35,6 +37,7 @@ esp32s3 = [
     "esp-backtrace/esp32s3",
     "esp-println/esp32s3",
     "esp-bootloader-esp-idf/esp32s3",
+    "esp-alloc/esp32s3",
 ]
 
 [patch.crates-io]
