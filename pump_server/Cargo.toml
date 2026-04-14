@@ -19,8 +19,10 @@ esp-backtrace = { version = "0.18.1", features = ["panic-handler", "println"] }
 esp-bootloader-esp-idf = "0.4.0"
 esp-hal = { version = "1.0.0", features = ["defmt", "unstable"] }
 esp-println = { version = "0.16.1", features = ["defmt-espflash"] }
+esp-radio = { version = "0.17.0", features = ["ble", "defmt", "unstable"] }
 esp-rtos = { version = "0.2.0", features = ["defmt", "embassy"] }
-trouble-host = { git = "https://github.com/embassy-rs/trouble", version = "0.6.0" }
+esp-storage = "0.8.1"
+trouble-host = { git = "https://github.com/embassy-rs/trouble", features = ["defmt", "security"] }
 
 [features]
 default = ["esp32s3"]
@@ -30,6 +32,9 @@ esp32c3 = [
     "esp-backtrace/esp32c3",
     "esp-println/esp32c3",
     "esp-bootloader-esp-idf/esp32c3",
+    "esp-radio/esp32c3",
+    "esp-alloc/esp32c3",
+    "esp-storage/esp32c3",
 ]
 esp32s3 = [
     "esp-hal/esp32s3",
@@ -38,6 +43,9 @@ esp32s3 = [
     "esp-println/esp32s3",
     "esp-bootloader-esp-idf/esp32s3",
     "esp-alloc/esp32s3",
+    "esp-radio/esp32s3",
+    "esp-alloc/esp32s3",
+    "esp-storage/esp32s3",
 ]
 
 [patch.crates-io]

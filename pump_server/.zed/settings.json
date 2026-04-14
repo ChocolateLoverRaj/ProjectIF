@@ -4,6 +4,7 @@
       "initialization_options": {
         "cargo": {
           "features": ["esp32s3"],
+          "target": "xtensa-esp32s3-none-elf",
         },
       },
     },

@@ -5,10 +5,19 @@ use defmt::info;
 use embassy_executor::Spawner;
 use esp_backtrace as _;
 use esp_hal::{
-    interrupt::software::SoftwareInterruptControl, peripherals::EFUSE, timer::timg::TimerGroup,
+    efuse,
+    interrupt::software::SoftwareInterruptControl,
+    peripherals::EFUSE,
+    rng::{Trng, TrngSource},
+    timer::timg::TimerGroup,
 };
 use esp_println as _;
-use trouble_host::{HostResources, prelude::DefaultPacketPool};
+use esp_radio::ble::controller::BleConnector;
+use esp_storage::FlashStorage;
+use trouble_host::{
+    Address, HostResources, Stack,
+    prelude::{DefaultPacketPool, ExternalController},
+};
 
 esp_bootloader_esp_idf::esp_app_desc!();
 
@@ -45,7 +54,7 @@ async fn main(spawner: Spawner) {
         embassy_embedded_hal::adapter::BlockingAsync::new(FlashStorage::new(peripherals.FLASH));
 
     let mut resources =
-        HostResources::<DefaultPacketPool, CONNECTIONS_MAX, L2CAP_CHANNELS_MAX>::new();
+        HostResources::<_, DefaultPacketPool, CONNECTIONS_MAX, L2CAP_CHANNELS_MAX>::new();
 
     // Use the hardware bluetooth address
     let our_address = Address::random(
@@ -57,8 +66,9 @@ async fn main(spawner: Spawner) {
     info!("Our address = {:?}", our_address);
 
     let stack = trouble_host::new(controller, &mut resources);
-    stack
+    let stack = stack
         .set_random_address(our_address)
-        .set_random_generator_seed(&mut trng);
-    stack.set_io_capabilities(trouble_host::IoCapabilities::KeyboardDisplay);
+        .set_random_generator_seed(&mut trng)
+        .set_io_capabilities(trouble_host::IoCapabilities::DisplayOnly)
+        .build();
 }
