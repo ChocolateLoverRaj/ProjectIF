@@ -1595,6 +1595,7 @@ dependencies = [
  "defmt 1.0.1",
  "embassy-embedded-hal 0.6.0",
  "embassy-executor",
+ "embassy-futures",
  "esp-alloc",
  "esp-backtrace",
  "esp-bootloader-esp-idf",

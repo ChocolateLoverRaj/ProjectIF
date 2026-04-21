@@ -14,6 +14,7 @@ bench = false
 defmt = "1.0.1"
 embassy-embedded-hal = "0.6.0"
 embassy-executor = "0.9.1"
+embassy-futures = "0.1.2"
 esp-alloc = "0.9.0"
 esp-backtrace = { version = "0.18.1", features = ["panic-handler", "println"] }
 esp-bootloader-esp-idf = "0.4.0"

@@ -3,20 +3,24 @@
 
 use defmt::info;
 use embassy_executor::Spawner;
+use embassy_futures::join::join;
 use esp_backtrace as _;
 use esp_hal::{
     efuse,
     interrupt::software::SoftwareInterruptControl,
-    peripherals::EFUSE,
     rng::{Trng, TrngSource},
     timer::timg::TimerGroup,
 };
 use esp_println as _;
 use esp_radio::ble::controller::BleConnector;
 use esp_storage::FlashStorage;
+use trouble_host::Stack;
 use trouble_host::{
-    Address, HostResources, Stack,
-    prelude::{DefaultPacketPool, ExternalController},
+    Address, HostResources,
+    prelude::{
+        AdStructure, Advertisement, AdvertisementParameters, BR_EDR_NOT_SUPPORTED,
+        DefaultPacketPool, ExternalController, LE_GENERAL_DISCOVERABLE, uuid,
+    },
 };
 
 esp_bootloader_esp_idf::esp_app_desc!();
@@ -71,4 +75,48 @@ async fn main(spawner: Spawner) {
         .set_random_generator_seed(&mut trng)
         .set_io_capabilities(trouble_host::IoCapabilities::DisplayOnly)
         .build();
+
+    join(
+        async {
+            let mut adv_data = [0; 31];
+            let adv_data_len = AdStructure::encode_slice(
+                &[AdStructure::Flags(
+                    LE_GENERAL_DISCOVERABLE | BR_EDR_NOT_SUPPORTED,
+                )],
+                &mut adv_data[..],
+            )
+            .unwrap();
+
+            let mut scan_data = [0; 31];
+            let scan_data_len = AdStructure::encode_slice(
+                &[
+                    AdStructure::CompleteLocalName(b"ProjectIF Tower Controller"),
+                    AdStructure::CompleteServiceUuids128(&[uuid!(
+                        "4ae85006-50ec-40e7-91d9-99c56c5c042a"
+                    )
+                    .as_raw()
+                    .try_into()
+                    .unwrap()]),
+                ],
+                &mut scan_data[..],
+            )
+            .unwrap();
+
+            let advertiser = stack
+                .peripheral()
+                .advertise(
+                    &Default::default(),
+                    Advertisement::ConnectableScannableUndirected {
+                        adv_data: &adv_data[..adv_data_len],
+                        scan_data: &scan_data[..scan_data_len],
+                    },
+                )
+                .await
+                .unwrap();
+            let conn = advertiser.accept().await.unwrap();
+            info!("Connection established!");
+        },
+        async { stack.runner().run().await.unwrap() },
+    )
+    .await;
 }
