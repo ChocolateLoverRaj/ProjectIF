@@ -4,14 +4,14 @@
 let
   host-triple = "x86_64-unknown-linux-gnu";
   gcc-arch = "xtensa-esp-elf";
-  gcc-release = "15.2.0_20250920";
+  gcc-release = "15.2.0_20251204";
   toolchain-pkg = pkgs.stdenv.mkDerivation rec {
     pname = "esp32-xtensa-rust-toolchain";
-    version = "1.90.0.0";
+    version = "1.94.0.2";
     srcs = [
       (pkgs.fetchurl {
         url = "https://github.com/esp-rs/rust-build/releases/download/v${version}/rust-${version}-${host-triple}.tar.xz";
-        hash = "sha256-GmHoiEIVdOQbg72rNtSpg1GqYvV1tVXBtJczZprFacc=";
+        hash = "sha256-bOG2jBJtHuDBfUWejEg7kXaAAfzpzCz4lfbGiMMmKxU=";
       })
       (pkgs.fetchurl {
         url =
@@ -19,11 +19,11 @@ let
             gcc-file = "${gcc-arch}-${gcc-release}-x86_64-linux-gnu.tar.xz";
           in
           "https://github.com/espressif/crosstool-NG/releases/download/esp-${gcc-release}/${gcc-file}";
-        hash = "sha256-49d60UVEgUUnu+ei0PeexFkqTiM5LFHHOIwOaGtqaXc=";
+        hash = "sha256-PVD1zV8XOs/VJOB8HNabyZWFcxpBXKLlvOh5mX/mArg=";
       })
       (pkgs.fetchurl {
         url = "https://github.com/esp-rs/rust-build/releases/download/v${version}/rust-src-${version}.tar.xz";
-        hash = "sha256-BqSkAyX0ftKGBXIzYV3WtT5zjF59QE2T1DZO2fZNpZk=";
+        hash = "sha256-A8J1ScXW8c39Tw/6KKYsC6+XnCgkGewSGnfxttKxz4c=";
       })
       # TODO maybe I need clang but so far it works without https://github.com/esp-rs/espup/blob/main/src/toolchain/llvm.rs
     ];
@@ -53,24 +53,5 @@ in
   packages = with pkgs; [
     espflash
     toolchain-pkg
-    (pkgs.python3.withPackages (
-      ps: with ps; [
-        flask
-        matplotlib
-        numpy
-      ]
-    ))
-    pkg-config
-    dbus
   ];
-
-  LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [ pkgs.dbus ];
-  # shellHook = ''
-  #   if [ -f wifi.env ]; then
-  #     source wifi.env
-  #   else
-  #     echo "Please provide SSID and PASSWORD env var, e.g. via wifi.env file.";
-  #   fi
-  #   export FLASK_APP=$(git rev-parse --show-toplevel)/test_webserver.py
-  # '';
 })

@@ -90,7 +90,7 @@ async fn main(spawner: Spawner) {
             let mut scan_data = [0; 31];
             let scan_data_len = AdStructure::encode_slice(
                 &[
-                    AdStructure::CompleteLocalName(b"ProjectIF Tower Controller"),
+                    AdStructure::CompleteLocalName(b"ProjectIF T"),
                     AdStructure::CompleteServiceUuids128(&[uuid!(
                         "4ae85006-50ec-40e7-91d9-99c56c5c042a"
                     )
