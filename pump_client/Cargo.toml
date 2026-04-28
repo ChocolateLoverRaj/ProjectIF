@@ -1,0 +1,10 @@
+[package]
+name = "pump_client"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bluer = { version = "0.17.4", default-features = false, features = ["bluetoothd", "l2cap"] }
+futures = { version = "0.3.32", default-features = false }
+tokio = { version = "1.52.1", default-features = false, features = ["macros", "rt", "time"] }
+uuid = "1.23.1"

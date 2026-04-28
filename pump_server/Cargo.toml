@@ -15,6 +15,7 @@ defmt = "1.0.1"
 embassy-embedded-hal = "0.6.0"
 embassy-executor = "0.9.1"
 embassy-futures = "0.1.2"
+embassy-time = "0.5.1"
 esp-alloc = { git = "https://github.com/esp-rs/esp-hal" }
 esp-backtrace = { git = "https://github.com/esp-rs/esp-hal", features = [
     "panic-handler",

@@ -4,6 +4,7 @@
 use defmt::info;
 use embassy_executor::Spawner;
 use embassy_futures::join::join;
+use embassy_time::Timer;
 use esp_backtrace as _;
 use esp_hal::{
     efuse,
@@ -11,17 +12,18 @@ use esp_hal::{
     rng::{Trng, TrngSource},
     timer::timg::TimerGroup,
 };
-use esp_println as _;
+use esp_println::{self as _, println};
 use esp_radio::ble::controller::BleConnector;
 use esp_storage::FlashStorage;
-use trouble_host::Stack;
 use trouble_host::{
     Address, HostResources,
+    l2cap::L2capChannel,
     prelude::{
         AdStructure, Advertisement, AdvertisementParameters, BR_EDR_NOT_SUPPORTED,
         DefaultPacketPool, ExternalController, LE_GENERAL_DISCOVERABLE, uuid,
     },
 };
+use trouble_host::{Stack, l2cap::L2capChannelConfig};
 
 esp_bootloader_esp_idf::esp_app_desc!();
 
@@ -88,9 +90,10 @@ async fn main(spawner: Spawner) {
             .unwrap();
 
             let mut scan_data = [0; 31];
+            let name = "ProjectIF T";
             let scan_data_len = AdStructure::encode_slice(
                 &[
-                    AdStructure::CompleteLocalName(b"ProjectIF T"),
+                    AdStructure::CompleteLocalName(name.as_bytes()),
                     AdStructure::CompleteServiceUuids128(&[uuid!(
                         "4ae85006-50ec-40e7-91d9-99c56c5c042a"
                     )
@@ -113,8 +116,45 @@ async fn main(spawner: Spawner) {
                 )
                 .await
                 .unwrap();
+            info!("Advertising as {:?}", name);
             let conn = advertiser.accept().await.unwrap();
+
             info!("Connection established!");
+
+            /// Max number of connections
+            const CONNECTIONS_MAX: usize = 1;
+            // Size of payload we're expecting
+            const PAYLOAD_LEN: usize = 27;
+
+            let config = L2capChannelConfig {
+                mtu: Some(PAYLOAD_LEN as u16),
+                ..Default::default()
+            };
+            let channel = L2capChannel::listen(&stack, &conn)
+                .accept(&config)
+                .await
+                .unwrap();
+            let (mut tx, mut rx) = channel.split();
+            join(
+                async {
+                    loop {
+                        let mut buffer = [0; PAYLOAD_LEN];
+                        let bytes_read = rx.receive(&stack, &mut buffer).await.unwrap();
+                        let buffer = &buffer[..bytes_read];
+                        let str = str::from_utf8(buffer);
+                        println!("Buffer: {:?} {:?}", buffer, str);
+                    }
+                },
+                async {
+                    loop {
+                        tx.send(&stack, b"Hello from microcontroller")
+                            .await
+                            .unwrap();
+                        Timer::after_secs(1).await;
+                    }
+                },
+            )
+            .await;
         },
         async { stack.runner().run().await.unwrap() },
     )
