@@ -6,5 +6,6 @@ edition = "2024"
 [dependencies]
 bluer = { version = "0.17.4", default-features = false, features = ["bluetoothd", "l2cap"] }
 futures = { version = "0.3.32", default-features = false }
-tokio = { version = "1.52.1", default-features = false, features = ["macros", "rt", "time"] }
+rand = "0.10.1"
+tokio = { version = "1.52.1", default-features = false, features = ["macros", "rt", "time", "rt-multi-thread", "io-std"] }
 uuid = "1.23.1"
